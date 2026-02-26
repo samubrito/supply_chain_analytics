@@ -33,7 +33,7 @@
 
 <h2 id="arquitetura">3. Arquitetura de Dados & ETL</h2>
 
-´´´m
+```m
 let
     fxTrataArquivos = (arquivo as binary, colunasData as list, colunasCom_ as list) as table =>
     let
@@ -57,7 +57,7 @@ let
 in
     TipoAlterado
 
-´´´
+```
 
 <p>A extração foi projetada para simular um ambiente de Data Lake/SharePoint. O código em Linguagem M não apenas carrega dados, mas executa uma governança rigorosa:
 <ul>
