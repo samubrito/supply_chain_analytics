@@ -32,7 +32,7 @@
 </p>
 
 <h2 id="arquitetura">3. Arquitetura de Dados & ETL</h2>
-<p>
+
 ´´´m
 let
     fxTrataArquivos = (arquivo as binary, colunasData as list, colunasCom_ as list) as table =>
@@ -58,7 +58,7 @@ in
     TipoAlterado
 
 ´´´
-</p>
+
 <p>A extração foi projetada para simular um ambiente de Data Lake/SharePoint. O código em Linguagem M não apenas carrega dados, mas executa uma governança rigorosa:
 <ul>
     <li>Dinamismo de Fonte (Folder.Files): O código utiliza funções de filtragem de metadados para varrer diretórios e consolidar arquivos de forma dinâmica. Isso garante que, ao adicionar novos períodos de vendas na pasta, o modelo se auto-atualize sem intervenção humana.</li>
