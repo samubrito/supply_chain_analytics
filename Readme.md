@@ -16,11 +16,11 @@
 
 </details>
 
-<h2 class="visao_geral">1. Visão Geral</h2>
+<h2 id="visao_geral">1. Visão Geral</h2>
 <p>A operação sofria com a assimetria de informações entre as pontas da cadeia. O setor financeiro reportava receitas sem considerar o custo de oportunidade dos atrasos logísticos; a logística não tinha visibilidade sobre o impacto de fraudes no frete; e o marketing gerava rankings de clientes baseados em nomes duplicados, ignorando a identidade real (ID) dos consumidores. Isso resultava em decisões baseadas em dados ruidosos e perda de margem de lucro. Foi desenvolvido um ecossistema de Business Intelligence robusto, centralizado em um Modelo de Dados Relacional (Star Schema). A solução utiliza um pipeline de dados automatizado que unifica as visões estratégica, operacional e tática. O diferencial técnico reside na limpeza profunda via Power Query, que isolou variáveis de risco e normalizou a base de clientes, permitindo uma análise de lucratividade real por transação. O resultado foi a redução da incerteza operacional, permitindo que a gestão identifique instantaneamente onde o lucro está sendo drenado por ineficiência logística ou fraudes de pagamento, protegendo o EBITDA e otimizando o fluxo de caixa.
 </p>
 
-<h2 class="tecnologias">2. Tecnologias e Conceitos Utilizados</h2>
+<h2 id="tecnologias">2. Tecnologias e Conceitos Utilizados</h2>
 <p>
 <ul>
     <li>Power BI Desktop</li>
@@ -31,7 +31,34 @@
 </ul>
 </p>
 
-<h2 class="arquitetura">3. Arquitetura de Dados & ETL</h2>
+<h2 id="arquitetura">3. Arquitetura de Dados & ETL</h2>
+<p>
+´´´m
+let
+    fxTrataArquivos = (arquivo as binary, colunasData as list, colunasCom_ as list) as table =>
+    let
+        arquivoExcel = Excel.Workbook(arquivo, true){[Name="Sheet1"]}[Data],
+        converteData = Table.TransformColumns(arquivoExcel, 
+                                                List.Transform(colunasData, (c) => {c, each try DateTime.FromText(_,"en-US") otherwise null, type datetime})
+                                                ),
+        substitui_ = Table.ReplaceValue(converteData,"_"," ",Replacer.ReplaceText,colunasCom_)
+    in
+        substitui_,
+
+    colunasCom_ = {"Order Status"},
+    colunasData = {"order date (DateOrders)","shipping date (DateOrders)"},
+
+    Fonte = Folder.Contents("coloque_o_caminho_onde_esta_a_pasta\supply_chain_analytics")
+        {[Name="Logística"]}[Content]
+        {[Name="meses"]}[Content],
+    tabelasTratadas = Table.TransformColumns(Fonte,{{"Content", each fxTrataArquivos(_, colunasData, colunasCom_), type table}}),
+    combinaTabelas = Table.Combine(tabelasTratadas[Content]),
+    TipoAlterado = Table.TransformColumnTypes(combinaTabelas,{{"Type", type text}, {"Days for shipping (real)", Int64.Type}, {"Days for shipment (scheduled)", Int64.Type}, {"Benefit per order", type number}, {"Sales per customer", type number}, {"Delivery Status", type text}, {"Late_delivery_risk", Int64.Type}, {"Category Id", Int64.Type}, {"Category Name", type text}, {"Customer City", type text}, {"Customer Country", type text}, {"Customer Email", type text}, {"Customer Fname", type text}, {"Customer Id", Int64.Type}, {"Customer Lname", type text}, {"Customer Password", type text}, {"Customer Segment", type text}, {"Customer State", type text}, {"Customer Street", type text}, {"Customer Zipcode", Int64.Type}, {"Department Id", Int64.Type}, {"Department Name", type text}, {"Latitude", type number}, {"Longitude", type number}, {"Market", type text}, {"Order City", type text}, {"Order Country", type text}, {"Order Customer Id", Int64.Type}, {"order date (DateOrders)", type date}, {"Order Id", Int64.Type}, {"Order Item Cardprod Id", Int64.Type}, {"Order Item Discount", type number}, {"Order Item Discount Rate", type number}, {"Order Item Id", Int64.Type}, {"Order Item Product Price", type number}, {"Order Item Profit Ratio", type number}, {"Order Item Quantity", Int64.Type}, {"Sales", type number}, {"Order Item Total", type number}, {"Order Profit Per Order", type number}, {"Order Region", type text}, {"Order State", type text}, {"Order Status", type text}, {"Order Zipcode", Int64.Type}, {"Product Card Id", Int64.Type}, {"Product Category Id", Int64.Type}, {"Product Description", type any}, {"Product Image", type text}, {"Product Name", type text}, {"Product Price", type number}, {"Product Status", Int64.Type}, {"shipping date (DateOrders)", type datetime}, {"Shipping Mode", type text}})
+in
+    TipoAlterado
+
+´´´
+</p>
 <p>A extração foi projetada para simular um ambiente de Data Lake/SharePoint. O código em Linguagem M não apenas carrega dados, mas executa uma governança rigorosa:
 <ul>
     <li>Dinamismo de Fonte (Folder.Files): O código utiliza funções de filtragem de metadados para varrer diretórios e consolidar arquivos de forma dinâmica. Isso garante que, ao adicionar novos períodos de vendas na pasta, o modelo se auto-atualize sem intervenção humana.</li>
@@ -41,8 +68,8 @@
 
 </p>
 
-<h2 class="metricas">4. Métricas e Insights</h2>
-<h3 class="tela1">4.1. Tela 1: Visão Executiva (Strategic Overview)</h3>
+<h2 id="metricas">4. Métricas e Insights</h2>
+<h3 id="tela1">4.1. Tela 1: Visão Executiva (Strategic Overview)</h3>
 <p align="center">
   <img src="imagens/tela1.png" alt="Tela 1" width="400px">
 </p>
@@ -53,7 +80,7 @@
     <li><strong color="#718096">Insight:</strong> O cruzamento dessas métricas revelou que as regiões com maior faturamento não eram necessariamente as mais lucrativas, devido a custos operacionais elevados, direcionando o foco para a eficiência e não apenas para a venda.</li>
 </ul>
 
-<h3 class="tela2">4.2. Tela 2: Operações e Logística (Operational Efficiency)</h3>
+<h3 id="tela2">4.2. Tela 2: Operações e Logística (Operational Efficiency)</h3>
 <p align="center">
   <img src="imagens/tela2.png" alt="Tela 2" width="400px">
 </p>
@@ -64,7 +91,7 @@
     <li><strong color="#718096">Insight:</strong> A análise detectou que o modo de envio "Standard Class" possuía o maior Gap de Entrega em regiões específicas, sugerindo a necessidade de renegociar contratos com as transportadoras locais dessas rotas.</li>
 </ul>
 
-<h3 class="tela3">4.3. Tela 3: Customer Insights (Behavioral Analytics)</h3>
+<h3 id="tela3">4.3. Tela 3: Customer Insights (Behavioral Analytics)</h3>
 <p align="center">
   <img src="imagens/tela3.png" alt="Teal 3" width="400px">
 </p>
@@ -75,7 +102,7 @@
     <li><strong color="#718096">Insight:</strong> Descobriu-se que o segmento Corporate, apesar de ter uma frequência menor de pedidos, possui o maior LTV e a menor taxa de atraso de pagamento, sendo o público ideal para campanhas de expansão.</li>
 </ul>
 
-<h2 class="design">5. Diferenciais de UI/UX (Design)</h2>
+<h2 id="design">5. Diferenciais de UI/UX (Design)</h2>
 <p><strong color="#718096">Design Minimalista:</strong> Uso de tons de Azul Marinho e Teal (Verde Água), baseados na identidade visual da marca.</p>
 <p><strong color="#718096">Navegação Intuitiva:</strong> Menu lateral para alternância de telas e botão para "Limpar Filtros".</p>
 <p><strong color="#718096">Alta Performance:</strong> Visual limpo com poucos elementos pesados, garantindo carregamento rápido.</p>
